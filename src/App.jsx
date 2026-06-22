@@ -403,10 +403,14 @@ export default function App() {
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
           {lists.map(l => (
-            <div key={l.id} style={{ display: "flex", alignItems: "center", padding: "10px 12px", borderRadius: 12, background: activeId === l.id ? "#f0f0f0" : "transparent", marginBottom: 4, gap: 6 }}>
-              <span onClick={() => selectList(l.id)} style={{ flex: 1, fontSize: 16, fontWeight: activeId === l.id ? 600 : 400, cursor: "pointer" }}>{l.name}</span>
-              <button onClick={() => exportSingleList(l.id, l.name)} style={{ fontSize: 13, color: "#555", cursor: "pointer", padding: "5px 10px", borderRadius: 8, border: "1px solid #ddd", background: "#fff", flexShrink: 0 }}>⬇ Export</button>
-              <span onClick={() => deleteList(l.id)} style={{ fontSize: 22, color: "#ccc", padding: "0 4px", cursor: "pointer" }}>×</span>
+            <div key={l.id} style={{ borderRadius: 12, background: activeId === l.id ? "#f0f0f0" : "transparent", marginBottom: 4 }}>
+              <div style={{ display: "flex", alignItems: "center", padding: "12px 12px 4px 12px", gap: 6 }}>
+                <span onClick={() => selectList(l.id)} style={{ flex: 1, fontSize: 16, fontWeight: activeId === l.id ? 600 : 400, cursor: "pointer" }}>{l.name}</span>
+                <span onClick={() => deleteList(l.id)} style={{ fontSize: 22, color: "#ccc", padding: "0 4px", cursor: "pointer" }}>×</span>
+              </div>
+              <div style={{ padding: "0 12px 10px" }}>
+                <button onClick={() => exportSingleList(l.id, l.name)} style={{ fontSize: 12, color: "#666", cursor: "pointer", padding: "5px 12px", borderRadius: 8, border: "1px solid #ddd", background: "#fff", width: "100%" }}>⬇ Diese Liste exportieren</button>
+              </div>
             </div>
           ))}
           <button onClick={() => { setShowTemplatePicker(true); setDrawer(false); }} style={{ width: "100%", padding: "13px", border: "1.5px dashed #ccc", borderRadius: 12, background: "none", fontSize: 15, color: "#888", cursor: "pointer", marginTop: 4 }}>+ Neue Liste</button>
