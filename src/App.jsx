@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 const SEED_LIST = {
   id: "tour-de-paris", name: "Tour de Paris",
   categories: [
-    { id: "bekleidung", name: "Bekleidung", icon: "👕", items: [
+    { id: "radbekleidung", name: "Radbekleidung", icon: "👕", items: [
       "2x Sponsoren Trikot","2x Bib","1x Notfall Bib (Schwarz)","1x Windweste",
       "Armlinge","Beinlinge","Handschuhe","Caps/Stirnband","Buff","Helm",
       "Regenjacke","Regenhose","Fahrradschuhe","Regenüberschuhe",
