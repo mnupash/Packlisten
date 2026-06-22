@@ -1,34 +1,40 @@
 import { useState, useEffect, useRef } from "react";
 
-// ─── Seed / Default Liste ─────────────────────────────────────────────────────
 const SEED_LIST = {
   id: "tour-de-paris", name: "Tour de Paris",
   categories: [
-    { id: "radbekleidung", name: "Radbekleidung", icon: "👕", items: [
+    { id: "radbekleidung", name: "Radbekleidung", icon: "🚴", items: [
       "2x Sponsoren Trikot","2x Bib","1x Notfall Bib (Schwarz)","1x Windweste",
       "Armlinge","Beinlinge","Handschuhe","Caps/Stirnband","Buff","Helm",
       "Regenjacke","Regenhose","Fahrradschuhe","Regenüberschuhe",
       "Radbrillen (Helles/Dunkles Visier)","Socken",
     ]},
-    { id: "rad", name: "Rad & Werkzeug", icon: "🔧", items: [
-      "Multitool","Flickzeug-Set","Ersatzschlauch x2","Reifenheber x2",
-      "Minipumpe","CO2-Patronen","Kettenschloss x2","Fahrradschloss","Kettenoel",
+    { id: "freizeitkleidung", name: "Freizeitkleidung", icon: "👔", items: [
+      "kurze Sporthose","2x kurze Hosen","3-4 T-Shirts","1x lange Stoffhose",
+      "Socken","Boxershorts","Schuhe/Sneaker","Badelatschen",
+      "1x Handtuch groß","1x Handtuch klein",
     ]},
     { id: "elektronik", name: "Elektronik & Navigation", icon: "📱", items: [
-      "Garmin Edge 1040","Ladekabel(s)","Powerbank","Smartphone","Garmin Varia Radar","Kopfhoerer",
+      "Radcomputer","Rücklicht","Powerbank","Smartphone","Ladekabel(s)","Kopfhörer",
     ]},
-    { id: "nutrition", name: "Verpflegung", icon: "🥗", items: [
-      "Energiegels","Energieriegel","Elektrolyttabletten","Trinkflaschen x2","Isotonik-Pulver",
+    { id: "rad", name: "Rad & Werkzeug", icon: "🔧", items: [
+      "Multitool","Flickzeug-Set","Ersatzschlauch x2","Ersatzmantel 1x",
+      "Ersatzcleats 1x","Reifenheber x2","Minipumpe","CO2-Patronen",
+      "Kettenschloss x2","Kettenwachs",
     ]},
-    { id: "unterkunft", name: "Übernachtung", icon: "⛺", items: [
-      "Zelt / Biwak","Schlafsack","Isomatte","Stirnlampe + Batterien",
+    { id: "nutrition", name: "Verpflegung", icon: "⚡", items: [
+      "Energiegels","Energieriegel","Elektrolyttabletten",
+      "Trinkflaschen x2","Isotonik-Pulver","Eiweißpulver",
     ]},
     { id: "hygiene", name: "Hygiene & Erste Hilfe", icon: "🩹", items: [
-      "Verbandszeug","Schmerzmittel","Sonnencreme LSF 50","Lippenpflege",
-      "Zahnbürste & Paste","Chamois Creme","Mikrofaser-Handtuch",
+      "Verbandszeug","Schmerzmittel","Persönliche Medikamente",
+      "Sonnencreme LSF 50","Lippenpflege","Zahnbürste & Paste",
+      "Mikrofaser-Handtuch","Deo","Haarshampoo & Duschgel","Bodylotion",
     ]},
     { id: "dokumente", name: "Dokumente & Sonstiges", icon: "🪪", items: [
-      "Personalausweis","Kreditkarte","Bargeld (EUR)","Krankenversicherungskarte","Startnummer / Teilnahmebeleg",
+      "Personalausweis","Kreditkarte","Bargeld (EUR)",
+      "Krankenversicherungskarte","Rynkeby Notfallkarte",
+      "Versicherungskarte (Ausland)","Impfpass",
     ]},
   ],
   todos: [
@@ -40,15 +46,14 @@ const SEED_LIST = {
   ]
 };
 
-// ─── Templates ────────────────────────────────────────────────────────────────
 const BUILTIN_TEMPLATES = [
   { id: "tourparis", name: "Tour de Paris", icon: "🗼", color: "#185FA5", desc: "Star Ride – deine Vorlage", categories: SEED_LIST.categories, todos: SEED_LIST.todos },
   { id: "bikepacking", name: "Bikepacking", icon: "🚴", color: "#1a1a1a", desc: "Mehrtägige Radreise",
     categories: [
-      { id: "bekleidung", name: "Bekleidung", icon: "👕", items: ["Trikot","Radhose (Bib)","Windjacke","Regenjacke","Helm","Handschuhe","Radsocken","Fahrradschuhe","Sonnenbrille","Basisschicht Langarm"] },
-      { id: "rad", name: "Rad & Werkzeug", icon: "🔧", items: ["Multitool","Flickzeug-Set","Ersatzschlauch x2","Reifenheber x2","Minipumpe","CO2-Patronen","Kettenschloss x2","Fahrradschloss","Kettenoel"] },
-      { id: "elektronik", name: "Elektronik", icon: "📱", items: ["Garmin Edge 1040","Ladekabel(s)","Powerbank","Smartphone","Garmin Varia Radar","Kopfhoerer"] },
-      { id: "nutrition", name: "Verpflegung", icon: "🥗", items: ["Energiegels","Energieriegel","Elektrolyttabletten","Trinkflaschen x2","Isotonik-Pulver"] },
+      { id: "bekleidung", name: "Radbekleidung", icon: "🚴", items: ["Trikot","Radhose (Bib)","Windjacke","Regenjacke","Helm","Handschuhe","Radsocken","Fahrradschuhe","Sonnenbrille","Basisschicht Langarm"] },
+      { id: "rad", name: "Rad & Werkzeug", icon: "🔧", items: ["Multitool","Flickzeug-Set","Ersatzschlauch x2","Reifenheber x2","Minipumpe","CO2-Patronen","Kettenschloss x2","Fahrradschloss","Kettenöl"] },
+      { id: "elektronik", name: "Elektronik", icon: "📱", items: ["Garmin Edge 1040","Ladekabel(s)","Powerbank","Smartphone","Garmin Varia Radar","Kopfhörer"] },
+      { id: "nutrition", name: "Verpflegung", icon: "⚡", items: ["Energiegels","Energieriegel","Elektrolyttabletten","Trinkflaschen x2","Isotonik-Pulver"] },
       { id: "unterkunft", name: "Übernachtung", icon: "⛺", items: ["Zelt / Biwak","Schlafsack","Isomatte","Stirnlampe + Batterien"] },
       { id: "hygiene", name: "Hygiene & Erste Hilfe", icon: "🩹", items: ["Verbandszeug","Schmerzmittel","Sonnencreme LSF 50","Lippenpflege","Zahnbürste & Paste","Chamois Creme","Mikrofaser-Handtuch"] },
       { id: "dokumente", name: "Dokumente", icon: "🪪", items: ["Personalausweis","Kreditkarte","Bargeld (EUR)","Krankenversicherungskarte"] },
@@ -57,7 +62,7 @@ const BUILTIN_TEMPLATES = [
   },
   { id: "sommerurlaub", name: "Sommerurlaub", icon: "🌞", color: "#854F0B", desc: "Strandurlaub & Reisen",
     categories: [
-      { id: "bekleidung", name: "Bekleidung", icon: "👕", items: ["T-Shirts x5","Shorts x3","Badehose / Bikini x2","Abendkleidung","Unterwäsche x7","Socken x5","Sandalen","Sneaker","Sonnenbrille","Sonnenhut"] },
+      { id: "bekleidung", name: "Bekleidung", icon: "👔", items: ["T-Shirts x5","Shorts x3","Badehose / Bikini x2","Abendkleidung","Unterwäsche x7","Socken x5","Sandalen","Sneaker","Sonnenbrille","Sonnenhut"] },
       { id: "strand", name: "Strand & Pool", icon: "🏖", items: ["Sonnencreme LSF 50","After-Sun-Lotion","Strandtuch","Schnorchel-Set","Flip Flops"] },
       { id: "elektronik", name: "Elektronik", icon: "📱", items: ["Smartphone","Ladekabel(s)","Powerbank","Kamera","Reisestecker-Adapter","Kopfhörer"] },
       { id: "hygiene", name: "Hygiene", icon: "🧴", items: ["Zahnbürste & Paste","Deo","Shampoo & Duschgel","Schmerzmittel","Mückenschutz","Verbandsmaterial"] },
@@ -67,8 +72,8 @@ const BUILTIN_TEMPLATES = [
   },
   { id: "backpacking", name: "Backpacking", icon: "🎒", color: "#3B6D11", desc: "Mehrtägige Trekking-Tour",
     categories: [
-      { id: "bekleidung", name: "Bekleidung", icon: "👕", items: ["Merino T-Shirt x2","Wanderhose","Fleecejacke","Hardshell Jacke","Wandersocken x3","Wanderschuhe","Mütze","Handschuhe","Buff"] },
-      { id: "schlafen", name: "Schlafen", icon: "🏕", items: ["Rucksack 60L","Zelt (ultralight)","Schlafsack (-5°C)","Isomatte","Stirnlampe + Batterien"] },
+      { id: "bekleidung", name: "Bekleidung", icon: "👔", items: ["Merino T-Shirt x2","Wanderhose","Fleecejacke","Hardshell Jacke","Wandersocken x3","Wanderschuhe","Mütze","Handschuhe","Buff"] },
+      { id: "schlafen", name: "Schlafen", icon: "⛺", items: ["Rucksack 60L","Zelt (ultralight)","Schlafsack (-5°C)","Isomatte","Stirnlampe + Batterien"] },
       { id: "kochen", name: "Kochen & Essen", icon: "🍳", items: ["Gaskocher","Gaskartuschen x2","Topf (klein)","Besteck","Feuerzeug","Wasserfilter","Trinkflasche x2"] },
       { id: "navigation", name: "Navigation", icon: "🗺", items: ["Karte (wasserfest)","Kompass","GPS offline","Pfeife","Notfalldecke","Erste-Hilfe-Set"] },
       { id: "hygiene", name: "Hygiene", icon: "🩹", items: ["Sonnencreme LSF 50","Insektenschutz","Zahnbürste & Paste (mini)","Schmerzmittel","Blasenpflaster"] },
@@ -88,11 +93,8 @@ const TAGS = {
 };
 
 const uid = () => Math.random().toString(36).slice(2, 9);
-
-const buildCatsFromTemplate = (tpl) =>
-  tpl.categories.map(c => ({ id: c.id + "-" + uid(), name: c.name, icon: c.icon, items: c.items.map(name => ({ id: uid(), name, checked: false })) }));
-const buildTodosFromTemplate = (tpl) =>
-  tpl.todos.map(t => ({ id: uid(), text: t.text, done: false, tag: t.tag }));
+const buildCatsFromTemplate = (tpl) => tpl.categories.map(c => ({ id: c.id + "-" + uid(), name: c.name, icon: c.icon, items: c.items.map(name => ({ id: uid(), name, checked: false })) }));
+const buildTodosFromTemplate = (tpl) => tpl.todos.map(t => ({ id: uid(), text: t.text, done: false, tag: t.tag }));
 
 const ls = {
   get: (k) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } },
@@ -135,11 +137,15 @@ export default function App() {
   const [syncMsg, setSyncMsg] = useState("");
   const [creating, setCreating] = useState(false);
 
-  // ─── Drag state (single, no hooks in loops) ───────────────────────────────
-  const [drag, setDrag] = useState(null); // { type:'cat'|'item', id, catId }
+  // ─── Inline editing state ─────────────────────────────────────────────────
+  const [editingCatId, setEditingCatId] = useState(null);
+  const [editingItemId, setEditingItemId] = useState(null);
+  const [editValue, setEditValue] = useState("");
+
+  // ─── Drag state ───────────────────────────────────────────────────────────
+  const [drag, setDrag] = useState(null);
   const [dragOver, setDragOver] = useState(null);
   const touchRef = useRef({ active: false });
-
   const importFile = useRef(null);
   const cloudEnabled = !!(apiKey && binId);
 
@@ -153,11 +159,7 @@ export default function App() {
     try { setSyncStatus("syncing"); const r = await jsonbin.getAll(binId, apiKey); setSyncStatus("ok"); setTimeout(() => setSyncStatus("idle"), 2000); return r; }
     catch (e) { setSyncStatus("error"); setSyncMsg(e.message); return null; }
   };
-
-  const getMaps = () => {
-    const prev = cloudEnabled ? (ls.get("jb-cache") || {}) : {};
-    return { listMap: { ...(prev.lists || ls.get("pack-lists") || {}) }, todoMap: { ...(prev.todos || ls.get("pack-todos") || {}) } };
-  };
+  const getMaps = () => { const prev = cloudEnabled ? (ls.get("jb-cache") || {}) : {}; return { listMap: { ...(prev.lists || ls.get("pack-lists") || {}) }, todoMap: { ...(prev.todos || ls.get("pack-todos") || {}) } }; };
   const persist = async (idx, lm, tm) => {
     if (cloudEnabled) { const r = { index: idx, lists: lm, todos: tm }; ls.set("jb-cache", r); await pushToCloud(r); }
     else { ls.set("pack-index", idx); ls.set("pack-lists", lm); ls.set("pack-todos", tm); }
@@ -172,7 +174,6 @@ export default function App() {
         else { const c = ls.get("jb-cache") || {}; idx = c.index; listMap = c.lists || {}; todoMap = c.todos || {}; }
       } else { idx = ls.get("pack-index"); listMap = ls.get("pack-lists") || {}; todoMap = ls.get("pack-todos") || {}; }
 
-      // Erster Start: Tour de Paris automatisch laden
       if (!idx || idx.length === 0) {
         const sid = uid();
         const seedCats = buildCatsFromTemplate(SEED_LIST);
@@ -191,48 +192,44 @@ export default function App() {
     })();
   }, []);
 
-  const selectList = (id) => {
-    const { listMap, todoMap } = getMaps();
-    if (listMap[id]) { setActiveId(id); setList(listMap[id]); }
-    setTodos(todoMap[id] || []); setDrawer(false);
-  };
-
+  const selectList = (id) => { const { listMap, todoMap } = getMaps(); if (listMap[id]) { setActiveId(id); setList(listMap[id]); } setTodos(todoMap[id] || []); setDrawer(false); };
   const createList = async () => {
     if (!pickedTemplate || !newListName.trim()) return;
     const name = newListName.trim(); const id = uid();
-    const d = { id, name, categories: buildCatsFromTemplate(pickedTemplate) };
-    const t = buildTodosFromTemplate(pickedTemplate);
-    const idx = [...lists, { id, name }];
-    const { listMap, todoMap } = getMaps();
+    const d = { id, name, categories: buildCatsFromTemplate(pickedTemplate) }; const t = buildTodosFromTemplate(pickedTemplate);
+    const idx = [...lists, { id, name }]; const { listMap, todoMap } = getMaps();
     listMap[id] = d; todoMap[id] = t;
     setLists(idx); setActiveId(id); setList(d); setTodos(t);
     await persist(idx, listMap, todoMap);
     setShowTemplatePicker(false); setPickedTemplate(null); setNewListName(""); setDrawer(false);
   };
-
   const deleteList = async (id) => {
-    const idx = lists.filter(l => l.id !== id);
-    const { listMap, todoMap } = getMaps();
-    delete listMap[id]; delete todoMap[id];
-    setLists(idx); await persist(idx, listMap, todoMap);
+    const idx = lists.filter(l => l.id !== id); const { listMap, todoMap } = getMaps();
+    delete listMap[id]; delete todoMap[id]; setLists(idx); await persist(idx, listMap, todoMap);
     if (activeId === id) { if (idx.length > 0) selectList(idx[0].id); else { setActiveId(null); setList(null); setTodos([]); } }
   };
-
   const saveCurrentAsTemplate = () => {
     const name = templateName.trim(); if (!name || !list) return;
     const tpl = { id: uid(), name, icon: "⭐", color: "#5F5E5A", desc: "Eigene Vorlage", categories: list.categories.map(c => ({ id: c.id, name: c.name, icon: c.icon, items: c.items.map(i => i.name) })), todos: todos.map(t => ({ text: t.text, tag: t.tag })) };
-    const updated = [...customTemplates, tpl];
-    setCustomTemplates(updated); ls.set("custom-templates", updated);
+    const updated = [...customTemplates, tpl]; setCustomTemplates(updated); ls.set("custom-templates", updated);
     setShowSaveTemplate(false); setTemplateName("");
   };
 
-  const updateList = async (u) => {
-    setList(u); const { listMap, todoMap } = getMaps(); listMap[activeId] = u;
-    await persist(lists, listMap, todoMap);
+  const updateList = async (u) => { setList(u); const { listMap, todoMap } = getMaps(); listMap[activeId] = u; await persist(lists, listMap, todoMap); };
+  const updateTodos = async (u) => { setTodos(u); const { listMap, todoMap } = getMaps(); todoMap[activeId] = u; await persist(lists, listMap, todoMap); };
+
+  // ─── Inline editing ───────────────────────────────────────────────────────
+  const startEditCat = (cat) => { setEditingCatId(cat.id); setEditingItemId(null); setEditValue(cat.name); };
+  const commitEditCat = (catId) => {
+    const name = editValue.trim(); if (!name) { setEditingCatId(null); return; }
+    updateList({ ...list, categories: list.categories.map(c => c.id !== catId ? c : { ...c, name }) });
+    setEditingCatId(null);
   };
-  const updateTodos = async (u) => {
-    setTodos(u); const { listMap, todoMap } = getMaps(); todoMap[activeId] = u;
-    await persist(lists, listMap, todoMap);
+  const startEditItem = (catId, item) => { setEditingItemId(item.id); setEditingCatId(null); setEditValue(item.name); };
+  const commitEditItem = (catId, itemId) => {
+    const name = editValue.trim(); if (!name) { setEditingItemId(null); return; }
+    updateList({ ...list, categories: list.categories.map(c => c.id !== catId ? c : { ...c, items: c.items.map(i => i.id !== itemId ? i : { ...i, name }) }) });
+    setEditingItemId(null);
   };
 
   // ─── List mutations ───────────────────────────────────────────────────────
@@ -247,79 +244,35 @@ export default function App() {
   const deleteTodo = (id) => updateTodos(todos.filter(t => t.id !== id));
   const clearDone = () => updateTodos(todos.filter(t => !t.done));
 
-  // ─── Drag & Drop (no hooks in loops!) ────────────────────────────────────
+  // ─── Drag & Drop ──────────────────────────────────────────────────────────
   const reorderCats = (fromId, toId) => {
     if (!list || fromId === toId) return;
     const cats = [...list.categories];
-    const fi = cats.findIndex(c => c.id === fromId);
-    const ti = cats.findIndex(c => c.id === toId);
+    const fi = cats.findIndex(c => c.id === fromId); const ti = cats.findIndex(c => c.id === toId);
     if (fi < 0 || ti < 0) return;
-    const [moved] = cats.splice(fi, 1);
-    cats.splice(ti, 0, moved);
+    const [moved] = cats.splice(fi, 1); cats.splice(ti, 0, moved);
     updateList({ ...list, categories: cats });
   };
-
   const reorderItems = (catId, fromId, toId) => {
     if (!list || fromId === toId) return;
     updateList({ ...list, categories: list.categories.map(c => {
       if (c.id !== catId) return c;
       const items = [...c.items];
-      const fi = items.findIndex(i => i.id === fromId);
-      const ti = items.findIndex(i => i.id === toId);
+      const fi = items.findIndex(i => i.id === fromId); const ti = items.findIndex(i => i.id === toId);
       if (fi < 0 || ti < 0) return c;
-      const [moved] = items.splice(fi, 1);
-      items.splice(ti, 0, moved);
+      const [moved] = items.splice(fi, 1); items.splice(ti, 0, moved);
       return { ...c, items };
     })});
   };
-
-  const onDragStart = (e, type, id, catId) => {
-    e.stopPropagation();
-    setDrag({ type, id, catId });
-    e.dataTransfer.effectAllowed = "move";
-  };
-  const onDragOver = (e, type, id, catId) => {
-    e.preventDefault(); e.stopPropagation();
-    setDragOver({ type, id, catId });
-  };
-  const onDrop = (e, type, id, catId) => {
-    e.preventDefault(); e.stopPropagation();
-    if (!drag) return;
-    if (type === "cat" && drag.type === "cat") reorderCats(drag.id, id);
-    if (type === "item" && drag.type === "item") reorderItems(catId, drag.id, id);
-    setDrag(null); setDragOver(null);
-  };
+  const onDragStart = (e, type, id, catId) => { e.stopPropagation(); setDrag({ type, id, catId }); e.dataTransfer.effectAllowed = "move"; };
+  const onDragOver = (e, type, id, catId) => { e.preventDefault(); e.stopPropagation(); setDragOver({ type, id, catId }); };
+  const onDrop = (e, type, id, catId) => { e.preventDefault(); e.stopPropagation(); if (!drag) return; if (type === "cat" && drag.type === "cat") reorderCats(drag.id, id); if (type === "item" && drag.type === "item") reorderItems(catId, drag.id, id); setDrag(null); setDragOver(null); };
   const onDragEnd = () => { setDrag(null); setDragOver(null); };
+  const onTouchStartHandle = (e, type, id, catId) => { e.stopPropagation(); touchRef.current = { active: true, type, id, catId }; setDrag({ type, id, catId }); };
+  const onTouchMove = (e) => { if (!touchRef.current.active) return; e.preventDefault(); const touch = e.touches[0]; const el = document.elementFromPoint(touch.clientX, touch.clientY); const target = el?.closest("[data-sortid]"); if (target) setDragOver({ type: target.dataset.sorttype, id: target.dataset.sortid, catId: target.dataset.sortcat }); };
+  const onTouchEnd = () => { if (touchRef.current.active && drag && dragOver && drag.id !== dragOver.id) { if (drag.type === "cat" && dragOver.type === "cat") reorderCats(drag.id, dragOver.id); if (drag.type === "item" && dragOver.type === "item") reorderItems(drag.catId, drag.id, dragOver.id); } touchRef.current.active = false; setDrag(null); setDragOver(null); };
 
-  // Touch drag
-  const onTouchStartHandle = (e, type, id, catId) => {
-    e.stopPropagation();
-    touchRef.current = { active: true, type, id, catId };
-    setDrag({ type, id, catId });
-  };
-  const onTouchMove = (e) => {
-    if (!touchRef.current.active) return;
-    e.preventDefault();
-    const touch = e.touches[0];
-    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    const target = el?.closest("[data-sortid]");
-    if (target) {
-      const otype = target.dataset.sorttype;
-      const oid = target.dataset.sortid;
-      const ocatId = target.dataset.sortcat;
-      setDragOver({ type: otype, id: oid, catId: ocatId });
-    }
-  };
-  const onTouchEnd = () => {
-    if (touchRef.current.active && drag && dragOver && drag.id !== dragOver.id) {
-      if (drag.type === "cat" && dragOver.type === "cat") reorderCats(drag.id, dragOver.id);
-      if (drag.type === "item" && dragOver.type === "item") reorderItems(drag.catId, drag.id, dragOver.id);
-    }
-    touchRef.current.active = false;
-    setDrag(null); setDragOver(null);
-  };
-
-  // ─── Export / Import ──────────────────────────────────────────────────────
+  // ─── Export / Import / Settings ───────────────────────────────────────────
   const exportData = () => {
     const { listMap, todoMap } = getMaps();
     const blob = new Blob([JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), index: lists, lists: listMap, todos: todoMap, customTemplates }, null, 2)], { type: "application/json" });
@@ -330,13 +283,10 @@ export default function App() {
     const reader = new FileReader();
     reader.onload = async (ev) => {
       try {
-        const data = JSON.parse(ev.target.result);
-        if (!data.index || !data.lists) { alert("Ungültige Datei"); return; }
-        setLists(data.index);
-        if (data.index.length > 0) { const id = data.index[0].id; setActiveId(id); setList(data.lists[id]); setTodos(data.todos?.[id] || []); }
+        const data = JSON.parse(ev.target.result); if (!data.index || !data.lists) { alert("Ungültige Datei"); return; }
+        setLists(data.index); if (data.index.length > 0) { const id = data.index[0].id; setActiveId(id); setList(data.lists[id]); setTodos(data.todos?.[id] || []); }
         if (data.customTemplates) { setCustomTemplates(data.customTemplates); ls.set("custom-templates", data.customTemplates); }
-        await persist(data.index, data.lists, data.todos || {});
-        alert("Import erfolgreich!");
+        await persist(data.index, data.lists, data.todos || {}); alert("Import erfolgreich!");
       } catch { alert("Fehler beim Importieren"); }
     };
     reader.readAsText(file); e.target.value = "";
@@ -366,7 +316,6 @@ export default function App() {
     </div>
   );
 
-  // ─── Render ───────────────────────────────────────────────────────────────
   return (
     <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: "#f2f2f7", minHeight: "100svh", display: "flex", flexDirection: "column", maxWidth: 600, margin: "0 auto" }}>
 
@@ -385,9 +334,7 @@ export default function App() {
                     <button key={tpl.id} onClick={() => setPickedTemplate(tpl)} style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "14px", borderRadius: 14, border: "1.5px solid #e8e8e8", background: "#fafafa", cursor: "pointer", textAlign: "left", gap: 4 }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
                         <span style={{ fontSize: 26 }}>{tpl.icon}</span>
-                        {!BUILTIN_TEMPLATES.find(b => b.id === tpl.id) && (
-                          <span onClick={(e) => { e.stopPropagation(); const u = customTemplates.filter(t => t.id !== tpl.id); setCustomTemplates(u); ls.set("custom-templates", u); }} style={{ fontSize: 18, color: "#ccc" }}>×</span>
-                        )}
+                        {!BUILTIN_TEMPLATES.find(b => b.id === tpl.id) && <span onClick={(e) => { e.stopPropagation(); const u = customTemplates.filter(t => t.id !== tpl.id); setCustomTemplates(u); ls.set("custom-templates", u); }} style={{ fontSize: 18, color: "#ccc" }}>×</span>}
                       </div>
                       <span style={{ fontWeight: 600, fontSize: 15 }}>{tpl.name}</span>
                       <span style={{ fontSize: 12, color: "#888" }}>{tpl.desc}</span>
@@ -419,16 +366,14 @@ export default function App() {
               <span style={{ fontWeight: 700, fontSize: 18 }}>Als Vorlage speichern</span>
               <button onClick={() => setShowSaveTemplate(false)} style={{ fontSize: 24, border: "none", background: "none", cursor: "pointer", color: "#999" }}>×</button>
             </div>
-            <input autoFocus value={templateName} onChange={e => setTemplateName(e.target.value)} onKeyDown={e => { if (e.key === "Enter") saveCurrentAsTemplate(); }} placeholder="Vorlagenname (z.B. Alpenüberquerung)" style={{ width: "100%", fontSize: 16, padding: "13px 14px", border: "1.5px solid #ddd", borderRadius: 12, boxSizing: "border-box", marginBottom: 14 }} />
-            <button onClick={saveCurrentAsTemplate} disabled={!templateName.trim()} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", background: templateName.trim() ? "#1a1a1a" : "#e0e0e0", color: templateName.trim() ? "#fff" : "#aaa", fontSize: 16, fontWeight: 600, cursor: templateName.trim() ? "pointer" : "default" }}>Vorlage speichern</button>
+            <input autoFocus value={templateName} onChange={e => setTemplateName(e.target.value)} onKeyDown={e => { if (e.key === "Enter") saveCurrentAsTemplate(); }} placeholder="Vorlagenname" style={{ width: "100%", fontSize: 16, padding: "13px 14px", border: "1.5px solid #ddd", borderRadius: 12, boxSizing: "border-box", marginBottom: 14 }} />
+            <button onClick={saveCurrentAsTemplate} disabled={!templateName.trim()} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", background: templateName.trim() ? "#1a1a1a" : "#e0e0e0", color: templateName.trim() ? "#fff" : "#aaa", fontSize: 16, fontWeight: 600, cursor: templateName.trim() ? "pointer" : "default" }}>Speichern</button>
           </div>
         </div>
       )}
 
-      {/* Drawer overlay */}
-      {drawer && <div onClick={() => setDrawer(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 40 }} />}
-
       {/* Drawer */}
+      {drawer && <div onClick={() => setDrawer(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 40 }} />}
       <div style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: 290, background: "#fff", zIndex: 50, transform: drawer ? "translateX(0)" : "translateX(-100%)", transition: "transform 0.25s ease", display: "flex", flexDirection: "column", paddingTop: "env(safe-area-inset-top,0px)" }}>
         <div style={{ padding: "16px 20px", borderBottom: "0.5px solid #e5e5e5", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span style={{ fontWeight: 700, fontSize: 18 }}>🚴 Listen</span>
@@ -474,7 +419,7 @@ export default function App() {
       {view === "settings" && (
         <div style={{ background: "#fff", margin: 16, borderRadius: 16, padding: 20 }}>
           <p style={{ fontWeight: 700, fontSize: 17, margin: "0 0 4px" }}>☁ JSONBin Sync</p>
-          <p style={{ fontSize: 13, color: "#888", margin: "0 0 14px", lineHeight: 1.5 }}>Gleiche Daten auf allen Geräten. <a href="https://jsonbin.io" target="_blank" rel="noreferrer" style={{ color: "#185FA5" }}>jsonbin.io</a> → API Keys.</p>
+          <p style={{ fontSize: 13, color: "#888", margin: "0 0 14px", lineHeight: 1.5 }}><a href="https://jsonbin.io" target="_blank" rel="noreferrer" style={{ color: "#185FA5" }}>jsonbin.io</a> → API Keys → Master Key.</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <input value={apiKeyInput} onChange={e => setApiKeyInput(e.target.value)} placeholder={apiKey ? "API Key (gesetzt)" : "Master API Key"} type="password" style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1px solid #ddd", borderRadius: 10, boxSizing: "border-box" }} />
             <input value={binIdInput} onChange={e => setBinIdInput(e.target.value)} placeholder={binId || "Bin ID (leer = neuen erstellen)"} style={{ width: "100%", fontSize: 15, padding: "12px 14px", border: "1px solid #ddd", borderRadius: 10, boxSizing: "border-box" }} />
@@ -497,7 +442,6 @@ export default function App() {
             </div>
           ) : tab === "pack" ? (
             <>
-              {/* Progress */}
               <div style={{ background: "#fff", borderRadius: 16, padding: "14px 16px", marginBottom: 14 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                   <span style={{ fontSize: 14, color: "#666" }}>{checked} von {total} gepackt</span>
@@ -511,7 +455,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Categories */}
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {list.categories.map((cat) => {
                   const cc = cat.items.filter(i => i.checked).length;
@@ -519,28 +462,28 @@ export default function App() {
                   const isCatDragging = drag?.type === "cat" && drag?.id === cat.id;
                   const isCatOver = dragOver?.type === "cat" && dragOver?.id === cat.id && drag?.id !== cat.id;
                   return (
-                    <div
-                      key={cat.id}
-                      data-sorttype="cat" data-sortid={cat.id}
+                    <div key={cat.id} data-sorttype="cat" data-sortid={cat.id}
                       onDragOver={(e) => onDragOver(e, "cat", cat.id, null)}
                       onDrop={(e) => onDrop(e, "cat", cat.id, null)}
                       onDragEnd={onDragEnd}
-                      style={{ background: "#fff", borderRadius: 16, overflow: "hidden", opacity: isCatDragging ? 0.4 : 1, border: isCatOver ? "2.5px solid #1a1a1a" : "2.5px solid transparent", transition: "opacity 0.15s, border-color 0.1s" }}
-                    >
+                      style={{ background: "#fff", borderRadius: 16, overflow: "hidden", opacity: isCatDragging ? 0.4 : 1, border: isCatOver ? "2.5px solid #1a1a1a" : "2.5px solid transparent" }}>
                       {/* Category header */}
                       <div style={{ padding: "11px 12px 11px 8px", background: "#f9f9f9", borderBottom: "0.5px solid #efefef", display: "flex", alignItems: "center", gap: 8 }}>
-                        {/* Drag handle — category */}
-                        <div
-                          draggable
-                          onDragStart={(e) => onDragStart(e, "cat", cat.id, null)}
+                        <div draggable onDragStart={(e) => onDragStart(e, "cat", cat.id, null)}
                           onTouchStart={(e) => onTouchStartHandle(e, "cat", cat.id, null)}
-                          onTouchMove={onTouchMove}
-                          onTouchEnd={onTouchEnd}
+                          onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
                           data-sorttype="cat" data-sortid={cat.id}
-                          style={{ fontSize: 20, color: "#ccc", cursor: "grab", touchAction: "none", userSelect: "none", padding: "2px 6px", flexShrink: 0 }}
-                        >⠿</div>
+                          style={{ fontSize: 20, color: "#ccc", cursor: "grab", touchAction: "none", userSelect: "none", padding: "2px 6px", flexShrink: 0 }}>⠿</div>
                         <span style={{ fontSize: 20 }}>{cat.icon}</span>
-                        <span style={{ fontWeight: 600, fontSize: 16, flex: 1 }}>{cat.name}</span>
+                        {/* Editable category name */}
+                        {editingCatId === cat.id ? (
+                          <input autoFocus value={editValue} onChange={e => setEditValue(e.target.value)}
+                            onBlur={() => commitEditCat(cat.id)}
+                            onKeyDown={e => { if (e.key === "Enter") commitEditCat(cat.id); if (e.key === "Escape") setEditingCatId(null); }}
+                            style={{ flex: 1, fontSize: 16, fontWeight: 600, border: "none", borderBottom: "2px solid #1a1a1a", background: "transparent", outline: "none", padding: "2px 0" }} />
+                        ) : (
+                          <span onDoubleClick={() => startEditCat(cat)} style={{ fontWeight: 600, fontSize: 16, flex: 1, cursor: "text" }} title="Doppeltippen zum Bearbeiten">{cat.name}</span>
+                        )}
                         <span style={{ fontSize: 13, color: cp === 100 ? "#3B6D11" : "#bbb" }}>{cc}/{cat.items.length}</span>
                         <div style={{ width: 36, height: 5, background: "#e5e5e5", borderRadius: 99, overflow: "hidden" }}>
                           <div style={{ height: "100%", width: cp + "%", background: cp === 100 ? "#3B6D11" : "#888", borderRadius: 99 }} />
@@ -553,34 +496,35 @@ export default function App() {
                         const isItemDragging = drag?.type === "item" && drag?.id === item.id;
                         const isItemOver = dragOver?.type === "item" && dragOver?.id === item.id && drag?.id !== item.id;
                         return (
-                          <div
-                            key={item.id}
-                            data-sorttype="item" data-sortid={item.id} data-sortcat={cat.id}
+                          <div key={item.id} data-sorttype="item" data-sortid={item.id} data-sortcat={cat.id}
                             onDragOver={(e) => onDragOver(e, "item", item.id, cat.id)}
                             onDrop={(e) => onDrop(e, "item", item.id, cat.id)}
                             onDragEnd={onDragEnd}
-                            style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 12px 12px 6px", borderBottom: "0.5px solid #f5f5f5", opacity: isItemDragging ? 0.35 : item.checked ? 0.4 : 1, borderTop: isItemOver ? "2px solid #1a1a1a" : "2px solid transparent", minHeight: 52, background: "#fff" }}
-                          >
-                            {/* Drag handle — item */}
-                            <div
-                              draggable
-                              onDragStart={(e) => onDragStart(e, "item", item.id, cat.id)}
+                            style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 12px 12px 6px", borderBottom: "0.5px solid #f5f5f5", opacity: isItemDragging ? 0.35 : item.checked ? 0.4 : 1, borderTop: isItemOver ? "2px solid #1a1a1a" : "2px solid transparent", minHeight: 52, background: "#fff" }}>
+                            <div draggable onDragStart={(e) => onDragStart(e, "item", item.id, cat.id)}
                               onTouchStart={(e) => onTouchStartHandle(e, "item", item.id, cat.id)}
-                              onTouchMove={onTouchMove}
-                              onTouchEnd={onTouchEnd}
+                              onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
                               data-sorttype="item" data-sortid={item.id} data-sortcat={cat.id}
-                              style={{ fontSize: 18, color: "#ddd", cursor: "grab", touchAction: "none", userSelect: "none", padding: "2px 6px", flexShrink: 0 }}
-                            >⠿</div>
-                            <div onClick={() => toggleItem(cat.id, item.id)} style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, cursor: "pointer" }}>
+                              style={{ fontSize: 18, color: "#ddd", cursor: "grab", touchAction: "none", userSelect: "none", padding: "2px 6px", flexShrink: 0 }}>⠿</div>
+                            <div onClick={() => { if (editingItemId !== item.id) toggleItem(cat.id, item.id); }} style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, cursor: "pointer" }}>
                               <Checkbox on={item.checked} />
-                              <span style={{ fontSize: 16, textDecoration: item.checked ? "line-through" : "none" }}>{item.name}</span>
+                              {/* Editable item name */}
+                              {editingItemId === item.id ? (
+                                <input autoFocus value={editValue} onChange={e => setEditValue(e.target.value)}
+                                  onBlur={() => commitEditItem(cat.id, item.id)}
+                                  onKeyDown={e => { if (e.key === "Enter") commitEditItem(cat.id, item.id); if (e.key === "Escape") setEditingItemId(null); }}
+                                  onClick={e => e.stopPropagation()}
+                                  style={{ flex: 1, fontSize: 16, border: "none", borderBottom: "2px solid #1a1a1a", background: "transparent", outline: "none", padding: "2px 0" }} />
+                              ) : (
+                                <span onDoubleClick={(e) => { e.stopPropagation(); startEditItem(cat.id, item); }}
+                                  style={{ fontSize: 16, textDecoration: item.checked ? "line-through" : "none" }}
+                                  title="Doppeltippen zum Bearbeiten">{item.name}</span>
+                              )}
                             </div>
                             <button onClick={() => deleteItem(cat.id, item.id)} style={{ fontSize: 20, border: "none", background: "none", cursor: "pointer", color: "#ddd", padding: "4px", flexShrink: 0 }}>×</button>
                           </div>
                         );
                       })}
-
-                      {/* Add item */}
                       <div style={{ display: "flex", gap: 8, padding: "10px 14px" }}>
                         <input value={newItems[cat.id] || ""} onChange={e => setNewItems(p => ({ ...p, [cat.id]: e.target.value }))} onKeyDown={e => { if (e.key === "Enter") addItem(cat.id); }} placeholder="Item hinzufügen…" style={{ flex: 1, fontSize: 15, padding: "10px 12px", border: "1px solid #e8e8e8", borderRadius: 10, background: "#fafafa" }} />
                         <button onClick={() => addItem(cat.id)} style={{ padding: "10px 16px", borderRadius: 10, border: "none", background: "#1a1a1a", color: "#fff", fontSize: 20, cursor: "pointer" }}>+</button>
@@ -589,7 +533,6 @@ export default function App() {
                   );
                 })}
 
-                {/* Add category */}
                 {showNewCat ? (
                   <div style={{ display: "flex", gap: 8 }}>
                     <input autoFocus value={newCatName} onChange={e => setNewCatName(e.target.value)} onKeyDown={e => { if (e.key === "Enter") addCategory(); if (e.key === "Escape") setShowNewCat(false); }} placeholder="Kategoriename" style={{ flex: 1, fontSize: 16, padding: "12px 14px", border: "1px solid #ddd", borderRadius: 12 }} />
@@ -602,7 +545,6 @@ export default function App() {
               </div>
             </>
           ) : (
-            /* To-Do Tab */
             <>
               <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 12, scrollbarWidth: "none" }}>
                 {["all", "open", ...Object.keys(TAGS)].map(f => {
