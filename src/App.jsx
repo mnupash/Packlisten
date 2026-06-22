@@ -405,7 +405,7 @@ export default function App() {
           {lists.map(l => (
             <div key={l.id} style={{ display: "flex", alignItems: "center", padding: "10px 12px", borderRadius: 12, background: activeId === l.id ? "#f0f0f0" : "transparent", marginBottom: 4, gap: 6 }}>
               <span onClick={() => selectList(l.id)} style={{ flex: 1, fontSize: 16, fontWeight: activeId === l.id ? 600 : 400, cursor: "pointer" }}>{l.name}</span>
-              <span onClick={() => exportSingleList(l.id, l.name)} style={{ fontSize: 14, color: "#aaa", cursor: "pointer", padding: "2px 6px", borderRadius: 6, border: "0.5px solid #e0e0e0", background: "#fff" }} title="Liste exportieren">⬇</span>
+              <button onClick={() => exportSingleList(l.id, l.name)} style={{ fontSize: 13, color: "#555", cursor: "pointer", padding: "5px 10px", borderRadius: 8, border: "1px solid #ddd", background: "#fff", flexShrink: 0 }}>⬇ Export</button>
               <span onClick={() => deleteList(l.id)} style={{ fontSize: 22, color: "#ccc", padding: "0 4px", cursor: "pointer" }}>×</span>
             </div>
           ))}
