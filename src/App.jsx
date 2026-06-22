@@ -302,7 +302,7 @@ export default function App() {
           const newTodoMap = { ...todoMap, [imp.id]: data.todos?.[imp.id] || [] };
           setLists(newIdx); setActiveId(imp.id); setList(data.lists[imp.id]); setTodos(data.todos?.[imp.id] || []);
           await persist(newIdx, newListMap, newTodoMap);
-          alert("Liste "" + imp.name + "" importiert!");
+          alert("Liste " + imp.name + " importiert!");
         } else {
           // Kompletter Import
           setLists(data.index); if (data.index.length > 0) { const id = data.index[0].id; setActiveId(id); setList(data.lists[id]); setTodos(data.todos?.[id] || []); }
