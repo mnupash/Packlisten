@@ -278,15 +278,37 @@ export default function App() {
     const blob = new Blob([JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), index: lists, lists: listMap, todos: todoMap, customTemplates }, null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "packliste-" + new Date().toISOString().slice(0, 10) + ".json"; a.click();
   };
+  const exportSingleList = (listId, listName) => {
+    const { listMap, todoMap } = getMaps();
+    const data = { version: 1, type: "single", exportedAt: new Date().toISOString(), index: [{ id: listId, name: listName }], lists: { [listId]: listMap[listId] }, todos: { [listId]: todoMap[listId] || [] } };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = listName.replace(/\s+/g, "-").toLowerCase() + "-" + new Date().toISOString().slice(0, 10) + ".json"; a.click();
+  };
+
   const importData = (e) => {
     const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = async (ev) => {
       try {
         const data = JSON.parse(ev.target.result); if (!data.index || !data.lists) { alert("Ungültige Datei"); return; }
-        setLists(data.index); if (data.index.length > 0) { const id = data.index[0].id; setActiveId(id); setList(data.lists[id]); setTodos(data.todos?.[id] || []); }
-        if (data.customTemplates) { setCustomTemplates(data.customTemplates); ls.set("custom-templates", data.customTemplates); }
-        await persist(data.index, data.lists, data.todos || {}); alert("Import erfolgreich!");
+        const { listMap, todoMap } = getMaps();
+        if (data.type === "single") {
+          // Einzelne Liste mergen — bestehende Listen bleiben erhalten
+          const imp = data.index[0];
+          const exists = lists.find(l => l.id === imp.id);
+          const newIdx = exists ? lists : [...lists, imp];
+          const newListMap = { ...listMap, [imp.id]: data.lists[imp.id] };
+          const newTodoMap = { ...todoMap, [imp.id]: data.todos?.[imp.id] || [] };
+          setLists(newIdx); setActiveId(imp.id); setList(data.lists[imp.id]); setTodos(data.todos?.[imp.id] || []);
+          await persist(newIdx, newListMap, newTodoMap);
+          alert("Liste "" + imp.name + "" importiert!");
+        } else {
+          // Kompletter Import
+          setLists(data.index); if (data.index.length > 0) { const id = data.index[0].id; setActiveId(id); setList(data.lists[id]); setTodos(data.todos?.[id] || []); }
+          if (data.customTemplates) { setCustomTemplates(data.customTemplates); ls.set("custom-templates", data.customTemplates); }
+          await persist(data.index, data.lists, data.todos || {}); alert("Import erfolgreich!");
+        }
       } catch { alert("Fehler beim Importieren"); }
     };
     reader.readAsText(file); e.target.value = "";
@@ -381,8 +403,9 @@ export default function App() {
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
           {lists.map(l => (
-            <div key={l.id} style={{ display: "flex", alignItems: "center", padding: "13px 12px", borderRadius: 12, background: activeId === l.id ? "#f0f0f0" : "transparent", marginBottom: 4 }}>
+            <div key={l.id} style={{ display: "flex", alignItems: "center", padding: "10px 12px", borderRadius: 12, background: activeId === l.id ? "#f0f0f0" : "transparent", marginBottom: 4, gap: 6 }}>
               <span onClick={() => selectList(l.id)} style={{ flex: 1, fontSize: 16, fontWeight: activeId === l.id ? 600 : 400, cursor: "pointer" }}>{l.name}</span>
+              <span onClick={() => exportSingleList(l.id, l.name)} style={{ fontSize: 14, color: "#aaa", cursor: "pointer", padding: "2px 6px", borderRadius: 6, border: "0.5px solid #e0e0e0", background: "#fff" }} title="Liste exportieren">⬇</span>
               <span onClick={() => deleteList(l.id)} style={{ fontSize: 22, color: "#ccc", padding: "0 4px", cursor: "pointer" }}>×</span>
             </div>
           ))}
